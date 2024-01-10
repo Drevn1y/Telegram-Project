@@ -1,8 +1,7 @@
 import sqlite3
 
 # Подключение к БД
-connection = sqlite3.connect("base.db", check_same_thread=False)
-
+connection = sqlite3.connect("shop.db", check_same_thread=False)
 # Python + SQL
 sql = connection.cursor()
 
@@ -36,3 +35,63 @@ def checker(id):
         return True
     else:
         return False
+
+
+## Методы для продуктов ##
+# Вывод инфы о конкретном товаре
+def get_pr(id):
+    result = sql.execute('SELECT pr_name, pr_des, pr_count, pr_photo, pr_price FROM products WHERE id=?;',
+                         (id,))
+    return result.fetchone()
+
+# Метод для отображения продуктов в кнопках
+def get_pr_but():
+    return sql.execute('SELECT id, pr_name, pr_count FROM products;').fetchall()
+
+
+# Метод для добавления продукта в БД
+def add_pr(name, des, count, photo, price):
+    sql.execute('INSERT INTO products(pr_name, pr_des, pr_count, pr_photo, pr_price) '
+                'VALUES(?, ?, ?, ?, ?);', (name, des, count, photo, price))
+    # Фиксируем изменения
+    connection.commit()
+
+# Метод для удаления
+def del_pr(id):
+    sql.execute('DELETE FROM products WHERE id=?;', (id,))
+    # Фиксируем изменения
+    connection.commit()
+
+# Метод для изменения количества
+def change_pr_count(id, new_count):
+    # Текущее кол-во товара
+    now_count = sql.execute('SELECT pr_count FROM products WHERE id=?;', (id,)).fetchone()
+    # Приход товара
+    plus_count = now_count[0] + new_count
+    sql.execute('UPDATE products SET pr_count=? WHERE id=?;', (plus_count, id))
+    # Фиксируем изменения
+    connection.commit()
+
+
+# Метод для проверки наличия продуктов в базе
+def check_pr():
+    if sql.execute('SELECT * FROM products;').fetchall():
+        return True
+    else:
+        return False
+
+
+# Метод для проверки наличия продукта по id
+def check_pr_id(id):
+    if sql.execute('SELECT id FROM products WHERE id=?;', (id,)).fetchone():
+        return True
+    else:
+        return False
+
+
+## Методы корзины ##
+def add_pr_to_cart(user_id, user_product, pr_amount, total):
+    sql.execute('INSERT INTO cart VALUES(?, ?, ?, ?);', (user_id, user_product, pr_amount, total))
+    # Фиксируем изменения
+    connection.commit()
+
