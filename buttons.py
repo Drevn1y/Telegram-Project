@@ -1,5 +1,23 @@
 from telebot import types
 
+# Кнопка выбора языка
+def language():
+    # Создаем пространство
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    # Создаем сами кнопки
+    russian = types.KeyboardButton("🇷🇺 Русский язык")
+    uzbek = types.KeyboardButton("🇺🇿 Uzbek tili")
+    kb.add(russian, uzbek)
+    return kb
+
+# # Кнопка ок
+def ok():
+    # Создаем пространство
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    # Создаем сами кнопки
+    ok = types.KeyboardButton("Ок")
+    kb.add(ok)
+    return kb
 
 # Кнопка для отправки номера
 def num_bt():
@@ -28,6 +46,19 @@ def main_menu_buttons(prods_from_db):
     kb = types.InlineKeyboardMarkup(row_width=2)
     # Создаем сами кнопки
     cart = types.InlineKeyboardButton(text='Корзина', callback_data='cart')
+    all_products = [types.InlineKeyboardButton(text=f'{i[1]}', callback_data=f'{i[0]}') for i in prods_from_db
+                    if i[2] > 0]
+    # Добавляем кнопки в пространство
+    kb.add(*all_products)
+    kb.row(cart)
+    return kb
+
+# Кнопки выбора товара uzb
+def main_menu_buttons_uzb(prods_from_db):
+    # Создаем пространство
+    kb = types.InlineKeyboardMarkup(row_width=2)
+    # Создаем сами кнопки
+    cart = types.InlineKeyboardButton(text='Savat', callback_data='cart')
     all_products = [types.InlineKeyboardButton(text=f'{i[1]}', callback_data=f'{i[0]}') for i in prods_from_db
                     if i[2] > 0]
     # Добавляем кнопки в пространство

@@ -6,7 +6,7 @@ bot = telebot.TeleBot('6840296569:AAGuz7W67cXWpg6tyaN8PWNEhnq5ijz0LRg')
 # Использование карт
 geolocator = Nominatim(user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
-
+# Russian ==============================================================================================================
 # Обработка команды start
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -20,11 +20,10 @@ def start_message(message):
         bot.send_message(user_id, f'Выберите пункт меню:',
                          reply_markup=bt.main_menu_buttons(products))
     else:
-        bot.send_message(user_id, "Здравствуйте, добро пожаловать! Давайте начнем "
-                                  "регистрацию, введите свое имя!")
+        bot.send_message(user_id, "Здравствуйте, добро пожаловать!"
+                                  "Давайте начнем регистрацию, введите свое имя!")
         # Переход на этап получения имени
         bot.register_next_step_handler(message, get_name)
-
 
 # Этап получения имени
 def get_name(message):
@@ -70,8 +69,42 @@ def get_location(message, name, number):
                          reply_markup=bt.loc_bt())
         # Этап получения номера
         bot.register_next_step_handler(message, get_location, name, number)
+#=======================================================================================================================
+# Обработка команды language
+@bot.message_handler(commands=['language'])
+def select_language(message):
+    user_id = message.from_user.id
+    bot.send_message(user_id, 'Tilni tanlang / Выберите язык', reply_markup=bt.language())
 
+@bot.message_handler(func=lambda message: message.text == "🇷🇺 Русский язык")
+def set_russian_language(message):
+    user_id = message.from_user.id
+    bot.send_message(user_id, "Язык изменён на русский!", reply_markup=telebot.types.ReplyKeyboardRemove())
+    bot.send_message(user_id, 'Нажмите на кнопку ок!', reply_markup=bt.ok())
+    bot.register_next_step_handler(message, start_message)
 
+@bot.message_handler(func=lambda message: message.text == "🇺🇿 Uzbek tili")
+def set_uzbek_language(message):
+    user_id = message.from_user.id
+    bot.send_message(user_id, 'Uzbek tiliga ozgarildi!', reply_markup=telebot.types.ReplyKeyboardRemove())
+    bot.send_message(user_id, 'OK knopkasini bosing!', reply_markup=bt.ok())
+    bot.register_next_step_handler(message, start_message_uzb)
+# Uzbek ================================================================================================================
+# Обработка команды start
+@bot.message_handler(commands=['start'])
+def start_message_uzb(message):
+    user_id = message.from_user.id
+    # Проверка пользователя
+    check = db.checker(user_id)
+    if check:
+        products = db.get_pr_but()
+        bot.send_message(user_id, f'Hush kelibsiz, {message.from_user.first_name}!',
+                         reply_markup=telebot.types.ReplyKeyboardRemove())
+        bot.send_message(user_id, f'Menu knopkasini tanlang!',
+                         reply_markup=bt.main_menu_buttons_uzb(products))
+    else:
+        pass
+#=======================================================================================================================
 # Обработка команды admin
 @bot.message_handler(commands=['admin'])
 def act(message):
